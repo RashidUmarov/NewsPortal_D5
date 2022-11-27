@@ -1,0 +1,107 @@
+
+from news.models import *
+from accounts.models import Author
+
+user1=User.objects.create(username='user1',password='123456')
+user2=User.objects.create(username='user2',password='123456')
+user3=User.objects.create(username='user3',password='123456')
+user4=User.objects.create(username='user4',password='123456')
+
+author1=Author.objects.create(author=user3, full_name='Александр Сергеевич Пушкин')
+author2=Author.objects.create(author=user4, full_name='Лев Николаевич Толстой')
+
+cat_music=Category.objects.create(name='Музыка')
+cat_sport=Category.objects.create(name='Спорт')
+cat_science=Category.objects.create(name='Наука')
+cat_auto=Category.objects.create(name='Авто')
+
+types=Post.TYPES
+
+art1=Post.objects.create(author=author1,title='Команды Формулы-1 хотят ввести зимние каникулы на базах')
+art1.message_type=types[1][0]
+art1.save()
+
+art1.categories.add(cat_sport)
+art1.save()
+art1.categories.add(cat_auto)
+art1.save()
+
+art1.content='«Здорово, что сезон-2022 заканчивается на пару недель раньше, нам всем не помешает отдых. Мы хотим ввести дополнительную паузу в следующем году. Не все с этим согласны, но я надеюсь, что мы сможем это сделать ради наших работников. Пара свободных недель сыграет на пользу. Многие люди на заводах работают на износ в рождественские праздники, так что это хорошая идея для команды, которая преодолевает за год десятки тысяч километров. Нужна пауза хотя бы в две недели на Рождество.'
+art1.save()
+
+art2=Post.objects.create(author=author2,title='"РГ" перечислила новые автомашины, которые будут продаваться в автосалонах РФ с 2023 года')
+art2.message_type=types[1][0]
+art2.save()
+
+art2.categories.add(cat_sport)
+art2.save()
+art2.categories.add(cat_science)
+art2.save()
+
+art2.content='«С уверенностью можно сказать, что в наличии будут представители китайского автопрома, которые будут расширять свой модельный ряд и дилерскую сеть в России. Также можно быть уверенными в поставках от отечественных заводов — АвтоВАЗ, «Москвич», Evolute, который запустили выпуск электромобилей в сентябре текущего года», — сказал Денис Мигаль.'
+art2.save()
+
+
+post1=Post.objects.create(author=author1,title='Впервые в России произведено подключение к 5G через спутник')
+post1.categories.add(cat_science)
+post1.save()
+
+post1.content='Впервые в России произведено подключение базовой станции 5G к ядру сети через спутниковый канал. ФГУП "Космическая связь" (ГП КС) и Сколковский институт науки и технологий ("Сколтех") протестировали работу частной сети пятого поколения на отечественном ПО через геостационарный спутник связи. Это первый случай, когда отечественный спутник использовался в интересах 5G. В перспективе это решение позволит обеспечить покрытие предприятий перспективными услугами 5G в удаленных районах. Об этом CNews сообщили представители ФГУП "Космическая связь".'
+post1.save()
+
+comment1=Comment.objects.create(post=art1,user=user1,text='Черт! Как-то быстро закончился сезон')
+comment2=Comment.objects.create(post=art1,user=user2,text='Да ездить никто не умеет, пусть валят домой')
+
+comment3=Comment.objects.create(post=art2,user=user1,text='Параллельный импорт в полную силу в России пока не заработал, надеюсь в следующем году цены станут нормальными')
+comment4=Comment.objects.create(post=post1,user=user1,text='Отлично! Осталось еще чтобы 5G появился на земле')
+
+
+art1.like()    
+art2.like()
+art2.like()
+art2.like() 
+post1.dislike() 
+
+calculate_ratings()
+
+best_author=Author.objects.all().order_by('-_rating').values('full_name','_rating')[0]  
+
+best_author
+best_user_id=Author.objects.all().order_by('-_rating')[0].author_id
+user=User.objects.get(pk=best_user)
+user.username
+
+Author.objects.all().order_by('-_rating')[0].post_set.all().values('title')
+
+best_article=Post.objects.filter(message_type=Post.article).order_by('-rating')[0]
+
+str(best_article.created)
+User.objects.get(pk=best_article.author_id).username
+best_article.title
+best_article.preview()
+
+comments=Comment.objects.filter(post=best_article)
+for c in comments:
+	name=User.objects.get(pk=c.user_id).username 
+	print(f'{c.created}:  {name} rating={c.rating}')
+	print(c.text)
+	
+	
+"""
+posts=Post.objects.filter(author=author1)     
+for p in posts:
+	p.content
+	
+
+comments = Comment.objects.filter(user=user1)
+for c in comments:	
+	c.text
+	
+
+posts=Post.objects.filter(author=author1)     
+for p in posts:
+	post_comments=Comment.objects.filter(post=p)
+	for c in post_comments:
+		(c.user, c.text)
+
+"""

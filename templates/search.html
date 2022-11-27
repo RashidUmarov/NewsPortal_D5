@@ -1,0 +1,119 @@
+<!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+<!-- Подключаем новый файл с нашим тегом -->
+{% load custom_tags %}
+<!-- Название у нас будет News list -->
+{% block title %}
+Список новостей
+{% endblock title %}
+
+<!-- В контенте на странице мы выводим все новости -->
+{% block content %}
+<h1 style="text-align: left;">Найдено публикаций: {{search|length}}</h1>
+
+
+{# Добавляем форму, которая объединяет набор полей, которые будут отправляться в запросе #}
+<form action="" method="get">
+    {{ filterset.form.non_field_errors }}
+
+    {{ filterset.form.name__icontains.errors }}
+
+    <form action="" method="get">
+        {{ filterset.form.as_p }}
+        <input type="submit" value="Найти"/>
+    </form>
+    <!--
+        <label for="{{ filterset.form.title__icontains.id_for_label }}">Поиск статей по названию, категории и дате</label>
+        <input
+                id="{{ filterset.form.title__icontains.id }}"
+                name="{{ filterset.form.title__icontains.name }}"
+                value=""
+                class="form-control"
+        >
+        <label for="created_after">Дата публикации:</label>
+
+        <input type="datetime-local" id="meeting-time"
+               name="created_gt" value="2018-06-12T00:00"
+               min="2018-06-07T00:00" max="2023-06-14T00:00">
+
+        <input type="submit" class="mt-3 btn-primary" value="Найти"/>
+    </form>
+    -->
+
+    <!-- Выводим новости, только если они найдены  с помощью тега if -->
+    {% if search %}
+    <!-- сделаем вывод в виде таблиц -->
+    <table cellspacing="0" cellpadding="3"> <!-- Начинаем описывать таблицу -->
+        <thead>
+        <tr> <!-- Добавляем строку -->
+            <th> <!-- Добавляем ячейку в строку -->
+                Заголовок
+            </th>
+            <th> <!-- Добавляем ещё одну ячейку в строку и так далее -->
+                Дата
+            </th>
+            <th>
+                Категория
+            </th>
+            <th>
+                Автор
+            </th>
+            <th>
+                Текст
+            </th>
+
+        </tr> <!-- Не забываем закрыть HTML-тег строки -->
+        </thead>
+        <tbody>
+        <!-- Для каждой новости будете генерироваться новая строчка,
+
+        т.е. новый HTML код, который указан в теле цикла.
+        При этом сам цикл работает точно так же, как и в Python.
+        postnews — переменная цикла, т.е. наш пост полученный из списка -->
+        {% for postnews in search %}
+        <tr>
+            <!-- Не забываем, что переменные в шаблоне ничем не отличаются
+
+             от переменных в Python. Здесь также можно получать доступ к
+             полям объекта модели. Например, здесь мы выводим имя,
+             в следующем столбце описание, и т.д.  -->
+            <td style="text-align: left;"><a href="{{postnews.id}}">{{ postnews.title|truncatechars:20|censor }}<a></td>
+            <td style="text-align: left;">{{ postnews.created|date:'d.m.Y' }}</td>
+            <td style="text-align: center;">{{ postnews.type}}</td>
+            <td style="text-align: left;">{{ postnews.author }}</td>
+            <td style="text-align: left;">{{ postnews.content|truncatechars:60|censor }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table> <!-- ... и таблицы -->
+    {% else %}
+        <!-- Если товаров нет, говорим, что новостей нет ;) -->
+        <h2>Новости не найдены</h2>
+    {% endif %}
+
+    {# Добавляем пагинацию на страницу #}
+
+    {# Информация о предыдущих страницах #}
+    {% if page_obj.has_previous %}
+        <a href="?{% url_replace page=1 %}">1</a>
+        {% if page_obj.previous_page_number != 1 %}
+        ...
+        <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+    {% endif %}
+    {% endif %}
+
+    {# Информация о текущей странице #}
+    {{ page_obj.number }}
+
+    {# Информация о следующих страницах #}
+    {% if page_obj.has_next %}
+        <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+        {% if paginator.num_pages != page_obj.next_page_number %}
+            ...
+            <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+        {% endif %}
+    {% endif %}
+
+    {% endblock content %}

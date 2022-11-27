@@ -1,0 +1,23 @@
+<!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+<!-- Подключаем новый файл с нашим тегом -->
+{% load custom_tags %}
+<!-- Название у нас будет Post -->
+{% block title %}
+<!-- на самом деле бессмысленно, если в default не задать блок  -->
+Post
+<!-- но если задать, то текст вылезает вверху страницы, а не в виде принятого title  -->
+{% endblock title %}
+
+<!-- В контенте на странице мы выводим саму новость, идентификатор которой был передан в url -->
+{% block content %}
+<br>
+<h3 style="text-align: left;">{{ post.title|censor}}</h3>
+<p style="text-align: left;">{% post_type post.message_type %} от {{post.created|date:'d.m.Y'}}&nbsp;&nbsp;&nbsp;&nbsp;   Автор&nbsp;{{post.author}} </p>
+<br>
+<div style="text-align: left;">
+{{post.content|censor}}
+</div>
+{% endblock content %}

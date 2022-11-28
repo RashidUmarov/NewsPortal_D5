@@ -1,0 +1,41 @@
+<!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+<!-- Подключаем новый файл с нашим тегом -->
+{% load custom_tags %}
+<!-- Название у нас будет Post -->
+{% block title %}
+<!-- на самом деле бессмысленно, если в default не задать блок  -->
+<p> {{ user }}  </p>>
+<!-- но если задать, то текст вылезает вверху страницы, а не в виде принятого title  -->
+{% endblock title %}
+
+<!-- В контенте на странице мы выводим саму новость, идентификатор которой был передан в url -->
+{% block content %}
+{% if request.user.is_authenticated %}
+<H3> Welcome, {{ user }}  !</H3>
+{% else %}
+<H2> Profile of user: {{ user }}  </H2>
+{% endif %}
+
+<p style="text-align: left;"> Name:{{ user.username }} </p>
+<p style="text-align: left;"> email:{{ user.email }} </p>
+<div align="left">
+
+    <form action="" method="post">
+        {% csrf_token %}
+         <label for="femail">Email:</label>
+        <input type="text" id="femail" name="email" value="{{ user.email }}">
+        <input type="submit" value="Change"> 	{#Displays a submit button (for submitting the form) #}
+
+    </form>
+    {% comment %}
+    <form action="" method="get">
+        {% csrf_token %}
+        {{ filterset.form.as_p }}
+        <input type="submit" value="Сменить"/>
+    </form>
+    {% endcomment %}
+</div>
+{% endblock content %}

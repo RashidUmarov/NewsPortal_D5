@@ -21,9 +21,10 @@ urlpatterns = [
     #path('accounts/', include('django.contrib.auth.urls')), # accounts теперь доступно только приложение allauth:
     #path("accounts/", include("accounts.urls")),  # Добавили эту строчку
     path("accounts/", include("allauth.urls")),  # Оставили только allauth
+    path("accounts/", include("accounts.urls")),  # Добавили эту строчку
     path('pages/', include('django.contrib.flatpages.urls')),
     # Делаем так, чтобы все адреса из нашего приложения (news/urls.py)
     # подключались к главному приложению с префиксом news/.
     path('news/', include('news.urls')),
-    path('articles/', include('news.urls')),
+    # path('articles/', include('news.urls')), убрал дубль
 ]

@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.auth.models import User, Group
 from django.views.generic.edit import CreateView, UpdateView
 from django.shortcuts import redirect, reverse
-from .forms import SignUpForm, UserProfile
+from .forms import SignUpForm, MyUserProfile
 
 
 class SignUp(CreateView):
@@ -13,10 +13,11 @@ class SignUp(CreateView):
 
     template_name = 'registration/signup.html'
 
+
 # class UserProfile(LoginRequiredMixin, UpdateView):
-class UserProfile( UpdateView):
+class UserProfile(UpdateView):
     permission_required = ('auth.change_user',)
-    form_class = UserProfile
+    form_class = MyUserProfile
     model = User
     # success_url = '/accounts/{{ user.id }}' # тут нарываемся на 405 ошибкe - сервер запрещает влоб менять email
     template_name = 'profile.html'
@@ -27,7 +28,7 @@ class UserProfile( UpdateView):
     def get_context_data(self, **kwargs):
         # получим объект пользователя
         user = super().get_object()
-        #print(f'user={user}')
+        # print(f'user={user}')
         # С помощью super() мы обращаемся к родительским классам
         # и вызываем у них метод get_context_data с теми же аргументами,
         # что и были переданы нам.
@@ -43,8 +44,9 @@ class UserProfile( UpdateView):
         return context
 
     def form_valid(self, form):
+        print(type(form))
         user = form.save(commit=False)
-        #print(user)
+        # print(user)
         checked = form.cleaned_data['author']
         print(f'author = {checked}')
         if checked:
@@ -60,3 +62,4 @@ class UserProfile( UpdateView):
         accounts\\urls.py
         path('<int:pk>', UserProfile.as_view(), name='profile'),
         """
+

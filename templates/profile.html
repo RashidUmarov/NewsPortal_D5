@@ -13,29 +13,35 @@
 
 <!-- В контенте на странице мы выводим саму новость, идентификатор которой был передан в url -->
 {% block content %}
-{% if request.user.is_authenticated %}
+{% if request.user.id == user.id %}
 <H3> Welcome, {{ user }}  !</H3>
 {% else %}
 <H2> Profile of user: {{ user }}  </H2>
 {% endif %}
 
-<p style="text-align: left;"> Name:{{ user.username }} </p>
-<p style="text-align: left;"> email:{{ user.email }} </p>
+<p style="text-align: left;"> Username: {{ user.username }} </p>
+<p style="text-align: left;"> Email: {{ user.email }} </p>
+<p style="text-align: left;"> Joined: {{ user.date_joined|date:'d.m.Y' }} </p>
+<p style="text-align: left;"> Author: {{ author }} </p>
 <div align="left">
-
+    {% comment %}
     <form action="" method="post">
         {% csrf_token %}
          <label for="femail">Email:</label>
         <input type="text" id="femail" name="email" value="{{ user.email }}">
         <input type="submit" value="Change"> 	{#Displays a submit button (for submitting the form) #}
-
-    </form>
-    {% comment %}
-    <form action="" method="get">
-        {% csrf_token %}
-        {{ filterset.form.as_p }}
-        <input type="submit" value="Сменить"/>
     </form>
     {% endcomment %}
+{% if request.user.is_authenticated %}
+    {% if request.user.id == user.id %}
+    <hr>
+    <h3> Изменить данные </h3>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Сохранить"/>
+    </form>
+    {% endif %}
+{% endif %}
 </div>
 {% endblock content %}

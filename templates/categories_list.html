@@ -9,25 +9,17 @@
 News list
 {% endblock title %}
 
-<!-- В контенте на странице мы выводим все новости -->
+<!-- В контенте на странице мы выводим все публикации из полученного списка -->
 {% block content %}
-<h1 style="text-align: left;">Все новости на {{ time_now|date:'d.m.Y' }} (всего {{news|length}})</h1>
-<p> количество новостей в виде тега: {% posts_length news %} </p>
+<h1 style="text-align: left;">Все публикации в категории {{category}}</h1>
 
-
-    {# Теперь будем проверять не request.user.is_authenticated, а конкретные права #}
-    {% if perms.news.add_post %}
-        {% if allow_post %}
-        <a href="{% url 'post_create' %}">Добавить новость</a>
-        {% else %}
-        Сегодня вы исчерпали лимит постов :(
-        {% endif %}
+    {% if is_not_subscriber %}
+    <p class="text-center"><a href="{% url 'subscribe' category.id %}" class="btn btn_secondary btn-sm"> Подписаться </a></p>
     {% endif %}
+
+<hr>
     <!-- Выводим новости, только если они есть с помощью тега if -->
-    {% if news %}
-    <!-- закоментим простой вывод
-    {{ news }}
-    -->
+    {% if category_posts_list %}
     <!-- сделаем вывод в виде таблиц -->
     <table cellspacing="0" cellpadding="3"> <!-- Начинаем описывать таблицу -->
         <thead>
@@ -47,10 +39,6 @@ News list
             <th>
                 Текст
             </th>
-            {# Условие получается составным. #}
-            {% if perms.news.change_post or perms.news.delete_post %}
-            <th>Действия</th>
-            {% endif %}
 
         </tr> <!-- Не забываем закрыть HTML-тег строки -->
         </thead>
@@ -60,16 +48,15 @@ News list
         т.е. новый HTML код, который указан в теле цикла.
         При этом сам цикл работает точно так же, как и в Python.
         post — переменная цикла, т.е. наш пост полученный из списка -->
-        {% for post in news %}
+        {% for post in category_posts_list %}
         <tr>
             <!-- Не забываем, что переменные в шаблоне ничем не отличаются
              от переменных в Python. Здесь также можно получать доступ к
              полям объекта модели. Например, здесь мы выводим имя,
              в следующем столбце описание, и т.д.  -->
-            <td style="text-align: left;"><a href="{{post.id}}">{{ post.title|truncatechars:20|censor }}</a></td>
+            <td style="text-align: left;"><a href="{% url 'post_detail' post.id %}">{{ post.title|truncatechars:20|censor }}</a></td>
             <td style="text-align: left;">{{ post.created|date:'d.m.Y' }}</td>
-            {#<td style="text-align: center;">{{ post.type}}</td>#}
-                        <td style="text-align: center;">
+            <td style="text-align: center;">
                 {% for category in post.categories.all %}
                 <a href="{% url 'categories_list' category.id %}"> {{ category }}&nbsp;  </a>
                 {% endfor %}
@@ -77,12 +64,6 @@ News list
             <td style="text-align: left;">{{ post.author }}</td>
             <td style="text-align: left;">{{ post.content|truncatechars:60|censor }}</td>
 
-            <td>
-                {# проверим право на редактирование поста #}
-                {% if perms.news.change_post %}
-                <a href="{% url 'post_update' pk=post.id %}">Редактировать</a>
-                {% endif %}
-            </td>
         </tr>
         {% endfor %}
         </tbody>

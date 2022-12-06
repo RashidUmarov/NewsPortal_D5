@@ -3,9 +3,17 @@
 {% block content %}
 <h1>Новость</h1>
 <hr>
-<form action="" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Save" />
-</form>
+
+{% if perms.news.add_post %}
+    {% if allow_post %}
+        <form action="" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Save"/>
+        </form>
+    {% else %}
+        Сегодня вы исчерпали лимит постов :(
+    {% endif %}
+{% endif %}
+
 {% endblock content %}

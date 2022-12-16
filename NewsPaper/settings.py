@@ -197,3 +197,13 @@ APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
 
 DAILY_POST_LIMIT = 3 # лимит на количество разрешенных постов в день
+
+
+# Модуль D7  - установлен redis для работы с celery
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE='Europe/Moscow' # для выполнение задач по расписанию
+CELERY_TASK_TIME_LIMIT= 30*60 # время жизни таска в секундах

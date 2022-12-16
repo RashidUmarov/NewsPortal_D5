@@ -1,9 +1,10 @@
 from django.urls import path
 # Импортируем созданное нами представление
 from .views import NewsList, NewsDetail, PostSearch, PostCreate, PostUpdate, PostDelete, ArticlesList , PostsByCategory,\
-    subscribe
+    subscribe, IndexView
 
 urlpatterns = [
+    # path('', IndexView.as_view()), это был временный корень news для тестирования выполнения задач из celery
     # path — означает путь.
     # В данном случае путь ко всем товарам у нас останется пустым,
     # чуть позже станет ясно почему.

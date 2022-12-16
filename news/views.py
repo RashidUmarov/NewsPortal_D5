@@ -8,7 +8,7 @@ from django.core.mail import send_mail
 # Импортируем класс, который говорит нам о том,
 # что в этом представлении мы будем выводить список объектов из БД
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Post, Author, Category
+from .models import Post, Category
 from .filters import PostFilter
 from .forms import PostForm
 from NewsPaper.settings import DAILY_POST_LIMIT
@@ -129,7 +129,6 @@ class PostCreate(LoginRequiredMixin, CreateView):
     # и новый шаблон, в котором используется форма.
     template_name = 'post_edit.html'
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # момент на сутки назад
@@ -139,7 +138,6 @@ class PostCreate(LoginRequiredMixin, CreateView):
         posts_day_count = posts_day_count = Post.objects.filter(created__gte=prev_day, author__author=user).count()
         context['allow_post'] = (posts_day_count < DAILY_POST_LIMIT)
         return context
-
 
     # def post(self, request, *args, **kwargs):
     #     print(f'request = {request}')
@@ -261,3 +259,23 @@ def subscribe(request, pk):
 
     message = 'Вы подписались на рассылку о новых публикациях в категории'
     return render(request, 'subscribe.html', {'category': category, 'message': message})
+
+
+from .tasks import hello, printer
+from django.views import View
+from django.http import HttpResponse
+
+# это тестовая вьюшка для отработки подключения celery к redis
+# эта вьюшка подключается в news/views.py
+# urlpatterns = [
+#    path('', IndexView.as_view()),
+
+from datetime import timezone
+class IndexView(View):
+    def get(self, request):
+        eta_utc = datetime.now(timezone.utc) + timedelta(seconds=5)
+        printer.apply_async([10],
+                            eta=eta_utc)
+        print(f'eta={eta_utc}')
+        hello.delay()
+        return HttpResponse('Hello!')
